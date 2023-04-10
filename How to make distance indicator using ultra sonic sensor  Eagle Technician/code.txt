@@ -1,0 +1,46 @@
+#define Trigpin 7
+#define Echopin 8
+#define low_led 9
+#define high_led 10
+float distance;
+int duration;
+int ll = 700;
+
+void setup() {
+  pinMode (Trigpin, OUTPUT);
+  pinMode (low_led, OUTPUT);
+  pinMode (high_led, OUTPUT);
+  pinMode (Echopin, INPUT);
+  Serial.begin(9600);
+ 
+  digitalWrite (low_led, LOW);
+  digitalWrite (high_led, LOW);
+}
+
+void loop() {
+  digitalWrite(Trigpin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(Trigpin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(Trigpin, LOW);
+  duration = pulseIn(Echopin, HIGH);
+  distance = duration * 0.034 / 2;
+  delay (ll);
+  
+  if (distance>10)
+  {
+    //Nobody Is Infront Of the Sensor
+    digitalWrite (low_led, HIGH);
+    delay (50);
+    digitalWrite (low_led, LOW);
+    delay (50);
+  }
+  if (distance<5) 
+  {
+    //Someone Is Infront Of the Sensor
+    digitalWrite (high_led, HIGH);
+    delay (50);
+    digitalWrite (high_led, LOW);
+    delay (50);
+  }
+}
