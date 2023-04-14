@@ -1,0 +1,151 @@
+#include <SPI.h>
+#include <MFRC522.h>
+#include <SoftwareSerial.h>
+#include <Adafruit_SSD1306.h>
+#include <Adafruit_GFX.h>
+
+
+
+#define OLED_WIDTH 128
+#define OLED_HEIGHT 64
+#define OLED_ADDR   0x3C
+
+
+#define SS_PIN 10
+#define RST_PIN 9
+
+Adafruit_SSD1306 display(OLED_WIDTH, OLED_HEIGHT);
+
+MFRC522 mfrc522(SS_PIN, RST_PIN);
+
+
+
+
+int red = 3;
+int white = 2;
+int butt = 4;
+
+bool st = false;
+int rel = 5;
+
+
+void setup() {
+
+  pinMode(red, OUTPUT);
+  pinMode(white, OUTPUT);
+  pinMode(green, OUTPUT);
+  pinMode(4, INPUT_PULLUP);
+  pinMode(rel, OUTPUT);
+
+  Serial.begin(9600);   // Initialize serial communication
+  SPI.begin();           // Initialize SPI bus
+  mfrc522.PCD_Init();    // Initialize MFRC522
+  Serial.println("Ready to read RFID tags!");
+
+
+  display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 17);
+  display.println("INOVATEK");
+  display.display();
+
+  delay(1000);
+
+  
+}
+
+void loop() {
+
+  if ( ! mfrc522.PICC_IsNewCardPresent() || ! mfrc522.PICC_ReadCardSerial() ) {
+    delay(50);
+    return;
+  }
+
+
+  Serial.print("Card UID: ");
+  for (byte i = 0; i < mfrc522.uid.size; i++) {
+    Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
+    Serial.print(mfrc522.uid.uidByte[i], HEX);
+  }
+  Serial.println();
+
+
+
+
+if (mfrc522.uid.uidByte[0] == 0x2B &&
+      mfrc522.uid.uidByte[1] == 0xF9 &&
+      mfrc522.uid.uidByte[2] == 0x47 &&
+      mfrc522.uid.uidByte[3] == 0x0E) {
+
+for(int i=0; i<=2; i++){
+      digitalWrite(white,HIGH);
+      delay(100);
+       digitalWrite(white,LOW);
+      delay(100);
+    }
+
+      }
+
+
+  if (mfrc522.uid.uidByte[0] == 0x2B &&
+      mfrc522.uid.uidByte[1] == 0xF9 &&
+      mfrc522.uid.uidByte[2] == 0x47 &&
+      mfrc522.uid.uidByte[3] == 0x0E) {
+        
+     
+    st = !st;
+   
+ 
+
+  }else{
+      display.clearDisplay();
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 17);
+  display.println("Wrong");
+  display.display();
+    for(int i=0; i<=5; i++){
+      digitalWrite(red,HIGH);
+      delay(100);
+       digitalWrite(red,LOW);
+      delay(100);
+    }
+  }
+
+
+  mfrc522.PICC_HaltA(); 
+
+  if(st == true){
+
+   
+      display.clearDisplay();
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 17);
+  display.println("Light ON");
+  display.display();
+  digitalWrite(rel,LOW);
+ 
+  }
+
+  
+
+
+
+  if(st == false){
+      display.clearDisplay();
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 17);
+  display.println("Light OFF");
+  display.display();
+    digitalWrite(rel,HIGH);
+  }
+
+  if(digitalRead(4)==LOW){
+  
+}
+
+}
